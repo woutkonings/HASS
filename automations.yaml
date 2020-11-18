@@ -1,0 +1,92 @@
+- alias: "Stop spotify when chromecast starts"
+  trigger:
+    - platform: state
+      entity_id: media_player.huiskamer
+      from: 'idle'
+      to: 'playing'
+  action:
+    - service: media_player.media_pause
+      entity_id: media_player.spotify_nielsbos
+
+- alias: "Start spotify when chromecast stops"
+  trigger:
+    - platform: state
+      entity_id: media_player.huiskamer
+      from: 'playing'
+      to: 'off'
+    - platform: state
+      entity_id: media_player.huiskamer
+      from: 'playing'
+      to: 'idle'
+    - platform: state
+      entity_id: media_player.huiskamer
+      from: 'paused'
+      to: 'off'
+  action:
+    - service: media_player.media_play
+      entity_id: media_player.spotify_nielsbos
+
+- alias: "Stop amplifier when spotify stops"
+  trigger:
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'playing'
+      to: 'off'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'playing'
+      to: 'idle'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'paused'
+      to: 'off'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'paused'
+      to: 'idle'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'idle'
+      to: 'off'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'playing'
+      to: 'paused'
+  action:
+    - service: switch.turn_off
+      entity_id: switch.sonoff_10006ce50d
+
+- alias: "Start amplifier when spotify start"
+  trigger:
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'off'
+      to: 'playing'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'idle'
+      to: 'playing'
+    - platform: state
+      entity_id: media_player.spotify_nielsbos
+      from: 'paused'
+      to: 'playing'
+  action:
+    - service: switch.turn_on
+      entity_id: switch.sonoff_10006ce50d
+  
+- id: 'wakeup'
+  alias: Wakeup
+  trigger:
+  - platform: template
+    value_template: >
+      {% set alarm_time = as_timestamp(states('input_datetime.next_alarm_date_and_time')) %}
+      {% set time_now = as_timestamp(states('sensor.date_time').replace(',','')) %}
+      {{ time_now >= ( alarm_time - 900 ) }}
+  condition:
+  - condition: state
+    entity_id: input_boolean.phone_alarm_set
+    state: 'on'
+  action:
+  - alias: ''
+    data: {}
+    service: script.wakeup_light

@@ -1,0 +1,164 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+##
+#####SENSORS
+##
+
+
+sensor:
+#NS sensor for routes
+  - platform: nederlandse_spoorwegen
+    api_key: !secret ns_api_key
+    routes:
+      - name: Rotterdam - Den Bosch
+        from: Rtd
+        to: HT
+      - name: Den Bosch Rotterdam
+        from: HT
+        to: Rtd
+      - name: Blaak - Delft
+        from: Rtb
+        to: Dt
+      - name: Blaak - Delft
+        from: Dt
+        to: Rtb
+      
+#Battery sensor      
+  - platform: template
+    sensors:
+      battery_phone:
+        friendly_name: AndroidPhone Battery
+        unit_of_measurement: '%'
+        value_template: >-
+            {%- if state_attr('device_tracker.asus_z012d', 'battery_level') %}
+                {{ state_attr('device_tracker.asus_z012d', 'battery_level')|round }}
+            {% else %}
+                {{ states('device_tracker.asus_z012d') }}
+            {%- endif %}
+        device_class: battery
+        
+#Untappd sensor          
+  - platform: untappd
+    username: Wout189
+    id: E0EDE4F1F4D05115BE2B43CFCD073D351320F8B9
+    secret: !secret untapped_secret_key
+    
+  - platform: rpi_power
+    text_state: true
+    
+#Sensor for the wakeuplight
+
+
+  - platform: time_date
+    display_options:
+      - 'time'
+      - 'date'
+      - 'date_time'
+      - 'date_time_iso'
+      - 'time_date'
+      - 'time_utc'
+      - 'beat'
+
+
+
+##
+#####CONFIGURATION
+##
+
+
+#DuckDNS configuration
+http:
+  base_url: https://wgk.duckdns.org
+  #base_url: https://192.168.1.102:8123
+  ssl_certificate: /ssl/fullchain.pem
+  ssl_key: /ssl/privkey.pem
+
+spotify:
+  client_id: 8d2a31bf16974a688d76456a9aeab238
+  client_secret: !secret spotify_secret_key
+
+
+mobile_app:
+
+#Cloud IDE configuration
+panel_iframe:
+  ide:
+    title: IDE
+    icon: mdi:code-braces
+    url: https://192.168.1.102:8321
+    
+#Callmebot config
+notify:
+  - name: WhatsApp
+    platform: command_line
+    command: 'wget $(cat) -O /dev/null'
+
+#yeelight config
+discovery:
+  ignore:
+    - yeelight
+yeelight:
+  devices:
+    192.168.1.110:
+      name: Woonkamer
+      model: color2
+      use_music_mode: True
+    192.168.1.101:
+      name: SlaapkamerWoutNew
+      model: color2
+      use_music_mode: True
+
+#influxdb config
+influxdb:
+  username: homeassistant
+  password: !secret infl_password
+  max_retries: 3
+  default_measurement: state
+  include:
+    entities:
+      - sensor.netherlands_coronavirus_deaths
+      - person.wout_konings
+
+#Sonoff amplifier config
+sonoff:
+  username: woutkonings@gmail.com
+  password: !secret sonoff_password
+  debug: True
+  
+#Wakeuplight config
+input_boolean:
+  phone_alarm_set:
+    name: Telefoon wekker
+    
+input_datetime:
+  next_alarm_date_and_time:
+    name: Telefoon alarm tijd
+    has_date: true
+    has_time: true
+    
+##
+#####CONFIGURATIONS SPLIT UP IN OTHER FILES
+##
+
+group: !include groups.yaml
+script: !include scripts.yaml
+automation: !include automations.yaml
+scene: !include scenes.yaml
+
+homeassistant:
+  customize: !include customize.yaml
+  
+#lovelace setting
+lovelace:
+  mode: yaml
+  
+  
+
+
+  

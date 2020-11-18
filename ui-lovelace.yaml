@@ -1,0 +1,50 @@
+title: Osso Jaffa
+resources:
+- type: module
+  url: >-
+      https://cdn.jsdelivr.net/gh/custom-cards/spotify-card@1.25.0/dist/spotify-card.umd.js
+- type: js
+  url: /community_plugin/light-entity-card/light-entity-card.js
+- type: js
+  url: >-
+      /community_plugin/light-entity-card/light-entity-card.js
+- type: js
+  url: www/community/light-entity-card/light-entity-card.js
+- type: js
+  url: /local/mini-media-player-bundle.js?v=1.9.1
+views:
+  - badges:
+      - entity: binary_sensor.updater
+      - entity: person.wout_konings
+      - entity: person.dima_poplavskiy
+      - entity: sensor.netherlands_coronavirus_deaths
+      - entity: sensor.asus_z012d_battery_level
+      - entity: sensor.asus_z012d_battery_state
+      - entity: sensor.asus_z012d_wifi_connection
+      - entity: sensor.asus_z012d_geocoded_location
+      - entity: sun.sun
+    cards:
+      - entity: media_player.huiskamer
+        type: media-control
+      - entity: media_player.spotify_nielsbos
+        type: media-control
+      - type: 'custom:spotify-card'
+        client_id: 80cfcaaf8e5f471daf5c95cab9d31924
+        limit: 30
+        device: Homie
+        height: '180px'
+        random_song: true
+      - entity: weather.osso_jaffa
+        type: weather-forecast
+      - entity: sensor.rpi_power_status
+        type: entity
+      - entity: device_tracker.25cdbc7f3ae178e8
+        type: entity
+      - type: light
+        entity: light.woonkamer
+      - type: light
+        entity: light.slaapkamerwoutnew
+
+        
+    path: default_view
+    title: Home
